@@ -1,8 +1,8 @@
 include images
 
-![Alt text](img1.jpg)
-![Alt text](img2.jpg)
-![Alt text](img3.jpg)
+![Alt text](img1.png)
+![Alt text](img2.png)
+![Alt text](img3.png)
 
 # linksoft-social-network
 
