@@ -1,15 +1,37 @@
-### API
+### API pro frontend
 
-### - run teh swagger
+### Create appsetings.json
 
-## 1. dotnet watch run (open swagger)
+```json
+{
+    "ConnectionStrings": {
+        "DefaultConnection": "Host={host};Port={port};Username={username};Password={password};Database={database}"
+    },
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+        }
+    },
+    "AllowedHosts": "*"
+}
+
+### Run app server command (swagger )
+
+## `dotnet watch run (open swagger) `
 
 ## DB
 
 ### create migrations
 
-### 1. dotnet ef migrations add init
+### `dotnet ef migrations add init`
 
 ### create tables
 
-### 2. dotnet ef database update
+### `dotnet ef database update`
+
+```
+
+```
+
+```
