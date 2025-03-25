@@ -1,0 +1,28 @@
+    // const workerRef = useRef<Worker | null>(null);
+
+    // useEffect(() => {
+    //     // Initialize worker only once when the component mounts
+    //     if (!workerRef.current) {
+    //         workerRef.current = new Worker("/workers/grouped-arr.js");
+    //         console.log("Worker initialized");
+    //     }
+
+    //     // Cleanup worker when the component unmounts
+    //     return () => {
+    //         workerRef.current?.terminate();
+    //         workerRef.current = null;
+    //         console.log("Worker terminated");
+    //     };
+    // }, []);
+
+    // const handleParsedJsonData = (data: SocialType[]) => {
+    //     console.log("Parsed Data:", data);
+
+    //     if (workerRef.current) {
+    //         workerRef.current.postMessage(data);
+
+    //         workerRef.current.onmessage = (ev) => {
+    //             console.log("Grouped by user ID:", ev.data);
+    //         };
+    //     }
+    // };

@@ -1,0 +1,11 @@
+const data = [
+  { userId: 0, userFriendId: 1 },
+    { userId: 0, userFriendId: 10 },
+      { userId: 0, userFriendId: 10 },
+        { userId: 0, userFriendId: 1 },  { userId: 3, userFriendId: 10 },
+          { userId: 4, userFriendId: 1 },
+];
+
+const grouped = Object.groupBy(data, item => item.userId);
+
+console.log(grouped);
