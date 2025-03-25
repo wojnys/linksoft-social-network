@@ -26,22 +26,11 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Load the .env file
-try
-{
-    DotEnv.Load();
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Error loading .env file: {ex.Message}");
-}
-
 
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
 
 
 builder.Services.AddScoped<IDatasetRepository, DatatsetService>();
