@@ -30,8 +30,5 @@
 
 ### `dotnet ef database update`
 
-```
-
-```
 
 ```

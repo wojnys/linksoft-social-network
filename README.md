@@ -1,3 +1,9 @@
+include images
+
+![Alt text](img1.jpg)
+![Alt text](img2.jpg)
+![Alt text](img3.jpg)
+
 # linksoft-social-network
 
 ### frontend is in NEXT JS
