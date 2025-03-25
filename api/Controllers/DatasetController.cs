@@ -101,6 +101,8 @@ namespace api.Controllers
             try
             {
                 var result = await _datasetRepository.CreateDatasetWithUsersAsync(request);
+                Console.WriteLine("resiult");
+                Console.WriteLine(result);
 
                 if (result == null)
                 {

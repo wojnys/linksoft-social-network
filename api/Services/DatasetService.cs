@@ -102,10 +102,11 @@ namespace api.Repository
             return await _context.Datasets.Include(u => u.Users).FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<Boolean> CheckDatasetName(string datasetName)
+        public async Task<bool> IsDatasetNameAvailable(string datasetName)
         {
-            var dataset = await _context.Datasets.FirstOrDefaultAsync(u => u.Name == datasetName);
-            return dataset == null;
+            // Check if a dataset with the given name exists
+            var datasetExists = await _context.Datasets.AnyAsync(u => u.Name == datasetName);
+            return !datasetExists; // Return true if the name is available, false otherwise
         }
 
         public async Task<Dataset?> CreateDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request)
@@ -115,7 +116,7 @@ namespace api.Repository
             try
             {
 
-                if (await CheckDatasetName(request.DatasetName) == false)
+                if (await IsDatasetNameAvailable(request.DatasetName) == false)
                 {
                     await transaction.RollbackAsync();
                     return null;

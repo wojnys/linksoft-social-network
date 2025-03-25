@@ -12,7 +12,7 @@ namespace api.Interfaces
         Task<Dataset> GetUsersDatasetStat(int datasetId);
 
         Task<Dataset?> CreateDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request);
-        Task<Boolean> CheckDatasetName(String datasetName);
+        Task<Boolean> IsDatasetNameAvailable(String datasetName);
 
         Task<Dataset?> GetByIdAsync(int id);  // first or null
         Task<Dataset> CreateAsync(Dataset datasetModel); // create
