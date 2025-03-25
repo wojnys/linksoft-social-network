@@ -14,7 +14,6 @@ namespace api.Mappers
                 UserId = userModel.UserId,
                 FrientId = userModel.FrientId,
                 DatasetId = userModel.DatasetId,
-                // Dataset = userModel.Dataset != null ? userModel.Dataset.ToDatasetDto() : null
             };
         }
     }

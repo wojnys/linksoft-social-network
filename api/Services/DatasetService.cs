@@ -142,8 +142,6 @@ namespace api.Repository
 
                 await transaction.CommitAsync();
 
-
-                // I need to calc 
                 datasetModel.UsersCount = await GetUsersCountForDataset(datasetModel.Id);
                 datasetModel.AverageFriendsPerUser = await GetAvarageUserFriendsForDataset(datasetModel.Id);
 
