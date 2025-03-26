@@ -1,6 +1,6 @@
 ### API pro frontend
 
-### Create appsetings.json
+### Create appsettings.json
 
 ```json
 {
