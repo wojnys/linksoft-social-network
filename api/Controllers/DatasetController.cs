@@ -14,13 +14,13 @@ namespace api.Controllers
 
     public class DatasetController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
+
         private readonly IDatasetRepository _datasetRepository;
 
         public DatasetController(ApplicationDBContext context, IDatasetRepository datasetRepository)
         {
             _datasetRepository = datasetRepository;
-            _context = context;
+
         }
         [HttpGet]
         public async Task<IActionResult> GetAll()

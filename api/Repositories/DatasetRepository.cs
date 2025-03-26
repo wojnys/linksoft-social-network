@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.Repository
 {
-    public class DatatsetService : IDatasetRepository
+    public class DatasetRepository : IDatasetRepository
     {
         private readonly ApplicationDBContext _context;
-        public DatatsetService(ApplicationDBContext context)
+        public DatasetRepository(ApplicationDBContext context)
         {
             _context = context;
         }

@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.Repository
 {
-    public class UserService : IUserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly ApplicationDBContext _context;
-        public UserService(ApplicationDBContext context)
+        public UserRepository(ApplicationDBContext context)
         {
             _context = context;
         }
