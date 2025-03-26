@@ -58,18 +58,6 @@ namespace api.Controllers
             return Ok(datasetWithoutUsersDto);
         }
 
-        [HttpGet("users-count/{datasetId}")]
-        public async Task<IActionResult> GetUsersCountForDataset([FromRoute] int datasetId)
-        {
-
-            var dataset = await _datasetRepository.GetUsersDatasetStat(datasetId);
-            if (dataset == null)
-            {
-                return NotFound();
-            }
-            return Ok(dataset);
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
@@ -79,15 +67,6 @@ namespace api.Controllers
                 return NotFound();
             }
             return Ok(dataset.ToDatasetDto());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateDatasetRequestDto datasetDto)
-        {
-            var datasetModel = datasetDto.ToDatasetFromCreateRequestDTO();
-            await _datasetRepository.CreateAsync(datasetModel);
-            return CreatedAtAction(nameof(GetById), new { id = datasetModel.Id }, datasetModel.ToDatasetDto()); // convert to DTO via mapper
-
         }
 
         [HttpPost("create-dataset-with-users")]
@@ -101,8 +80,6 @@ namespace api.Controllers
             try
             {
                 var result = await _datasetRepository.CreateDatasetWithUsersAsync(request);
-                Console.WriteLine("resiult");
-                Console.WriteLine(result);
 
                 if (result == null)
                 {

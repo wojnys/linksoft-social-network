@@ -2,7 +2,6 @@ using api.Data;
 using api.Interfaces;
 using api.Repository;
 using Microsoft.EntityFrameworkCore;
-using dotenv.net;
 
 var builder = WebApplication.CreateBuilder(args);
 
