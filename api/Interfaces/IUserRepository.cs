@@ -2,9 +2,9 @@ using api.Models;
 
 namespace api.Interfaces
 {
-    public interface IUserRepository
+    public interface IUserRepository : IGenericRepository<User>
     {
-        Task<List<User>> GetAllAsync();
-        Task<User?> GetByIdAsync(int id);
+        // Task<List<User>> GetAllAsync();
+        // Task<User?> GetByIdAsync(int id);
     }
 }

@@ -10,30 +10,32 @@ namespace api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserController(IUserRepository userRepository)
+
+        public UserController(IUnitOfWork unitOfWork)
         {
-            _userRepository = userRepository;
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var users = await _userRepository.GetAllAsync();
-            var userDto = users.Select(s => s.ToUserDto());
-            return Ok(userDto);
+            _unitOfWork = unitOfWork;
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute] int id)
-        {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return Ok(user.ToUserDto());
-        }
+        // [HttpGet]
+        // public async Task<IActionResult> GetAll()
+        // {
+        //     var users = await _userRepository.GetAllAsync();
+        //     var userDto = users.Select(s => s.ToUserDto());
+        //     return Ok(userDto);
+        // }
+
+        // [HttpGet("{id}")]
+        // public async Task<IActionResult> GetById([FromRoute] int id)
+        // {
+        //     var user = await _userRepository.GetByIdAsync(id);
+        //     if (user == null)
+        //     {
+        //         return NotFound();
+        //     }
+        //     return Ok(user.ToUserDto());
+        // }
 
     }
 }

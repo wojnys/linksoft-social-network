@@ -6,110 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.Repository
 {
-    public class DatasetRepository : IDatasetRepository
+    public class DatasetRepository : GenericRepository<Dataset>, IDatasetRepository
     {
         private readonly ApplicationDBContext _context;
-        public DatasetRepository(ApplicationDBContext context)
+
+        public DatasetRepository(ApplicationDBContext context) : base(context)
         {
             _context = context;
         }
 
-        public async Task<Dataset> CreateAsync(Dataset datasetModel)
-        {
-            await _context.Datasets.AddAsync(datasetModel);
-            await _context.SaveChangesAsync();
-            return datasetModel;
-        }
-
-        public async Task<List<Dataset>> GetAllAsync()
-        {
-            return await _context.Datasets.Include(u => u.Users).ToListAsync();
-        }
-        public async Task<List<Dataset>> GetAllWithoutUsersAsync()
-        {
-            return await _context.Datasets.ToListAsync();
-        }
-
-
-        public async Task<int> GetUsersCountForDataset(int datasetId)
-        {
-            var userIds = await _context.Users
-                .Where(u => u.DatasetId == datasetId)
-                .Select(u => u.UserId)
-                .Distinct()
-                .ToListAsync();
-
-            var friendIds = await _context.Users
-                .Where(u => u.DatasetId == datasetId)
-                .Select(u => u.FrientId)
-                .ToListAsync();
-
-            int uniqueUsers = userIds.Union(friendIds).Distinct().Count();
-            return uniqueUsers;
-        }
-
-        public async Task<Dataset> GetUsersDatasetStat(int datasetId)
-        {
-
-            return new Dataset
-            {
-                Id = datasetId,
-                Name = (await _context.Datasets.FindAsync(datasetId))?.Name ?? "none",
-                UsersCount = await GetUsersCountForDataset(datasetId),
-                AverageFriendsPerUser = await GetAvarageUserFriendsForDataset(datasetId)
-            };
-        }
-
-        public async Task<int> GetAvarageUserFriendsForDataset(int datasetId)
-        {
-            var userIdCounts = await _context.Users
-                .Where(u => u.DatasetId == datasetId)
-                .GroupBy(u => u.UserId)
-                .Select(g => new { UserId = g.Key, Count = g.Count() })
-                .ToListAsync();
-
-            var friendIdCounts = await _context.Users
-                .Where(u => u.DatasetId == datasetId)
-                .GroupBy(u => u.FrientId)
-                .Select(g => new { UserId = g.Key, Count = g.Count() })
-                .ToListAsync();
-
-            // Combine and sum the counts
-            var combinedCounts = userIdCounts
-                .Concat(friendIdCounts)
-                .GroupBy(x => x.UserId)
-                .Select(g => new
-                {
-                    UserId = g.Key,
-                    Count = g.Sum(x => x.Count)
-                })
-                .OrderByDescending(x => x.Count)
-                .ToList();
-
-            int sum = combinedCounts.Sum(x => x.Count);
-            int count = combinedCounts.Count;
-
-
-            if (count == 0)
-            {
-                return 0;
-            }
-            return sum / count;
-        }
-
-        public async Task<Dataset?> GetByIdAsync(int id)
-        {
-            return await _context.Datasets.Include(u => u.Users).FirstOrDefaultAsync(u => u.Id == id);
-        }
-
-        public async Task<bool> IsDatasetNameAvailable(string datasetName)
-        {
-            // Check if a dataset with the given name exists
-            var datasetExists = await _context.Datasets.AnyAsync(u => u.Name == datasetName);
-            return !datasetExists; // Return true if the name is available, false otherwise
-        }
-
-        public async Task<Dataset?> CreateDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request)
+        public async Task<Dataset?> AddDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request)
         {
             // Start a transaction
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -153,6 +59,81 @@ namespace api.Repository
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
+
+        public async Task<bool> IsDatasetNameAvailable(string datasetName)
+        {
+            var datasetExists = await _context.Datasets.AnyAsync(u => u.Name == datasetName);
+            return !datasetExists; // Return true if the name is available, false otherwise
+        }
+        public async Task<int> GetUsersCountForDataset(int datasetId)
+        {
+            var userIds = await _context.Users
+                .Where(u => u.DatasetId == datasetId)
+                .Select(u => u.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            var friendIds = await _context.Users
+                .Where(u => u.DatasetId == datasetId)
+                .Select(u => u.FrientId)
+                .ToListAsync();
+
+            int uniqueUsers = userIds.Union(friendIds).Distinct().Count();
+            return uniqueUsers;
+        }
+
+        public async Task<int> GetAvarageUserFriendsForDataset(int datasetId)
+        {
+            var userIdCounts = await _context.Users
+                .Where(u => u.DatasetId == datasetId)
+                .GroupBy(u => u.UserId)
+                .Select(g => new { UserId = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var friendIdCounts = await _context.Users
+                .Where(u => u.DatasetId == datasetId)
+                .GroupBy(u => u.FrientId)
+                .Select(g => new { UserId = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            // Combine and sum the counts
+            var combinedCounts = userIdCounts
+                .Concat(friendIdCounts)
+                .GroupBy(x => x.UserId)
+                .Select(g => new
+                {
+                    UserId = g.Key,
+                    Count = g.Sum(x => x.Count)
+                })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+
+            int sum = combinedCounts.Sum(x => x.Count);
+            int count = combinedCounts.Count;
+
+
+            if (count == 0)
+            {
+                return 0;
+            }
+            return sum / count;
+        }
+
+        public async Task<IEnumerable<Dataset>> GetAllWithUsersAsync()
+        {
+            return await _context.Datasets.Include(u => u.Users).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Dataset>> GetAllWithUserStatsAsync()
+        {
+            var datasets = await GetAllAsync();
+            foreach (var dataset in datasets)
+            {
+                dataset.UsersCount = await GetUsersCountForDataset(dataset.Id);
+                dataset.AverageFriendsPerUser = await GetAvarageUserFriendsForDataset(dataset.Id);
+            }
+            return datasets;
         }
     }
 }
