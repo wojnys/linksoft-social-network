@@ -1,6 +1,7 @@
 using api.Data;
 using api.Dtos.Databaset;
 using api.Interfaces;
+using api.Mappers;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,57 +16,59 @@ namespace api.Repository
             _context = context;
         }
 
-        public async Task<Dataset?> AddDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request)
-        {
-            // Start a transaction
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
 
-                if (await IsDatasetNameAvailable(request.DatasetName) == false)
-                {
-                    await transaction.RollbackAsync();
-                    return null;
-                }
+        // public async Task<Dataset?> AddDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request)
+        // {
+        //     // Start a transaction
+        //     using var transaction = await _context.Database.BeginTransactionAsync();
+        //     try
+        //     {
 
-
-                var datasetModel = new Dataset
-                {
-                    Name = request.DatasetName
-                };
-                await _context.Datasets.AddAsync(datasetModel);
-                await _context.SaveChangesAsync();
+        //         if (await IsDatasetNameAvailable(request.DatasetName) == false)
+        //         {
+        //             await transaction.RollbackAsync();
+        //             return null;
+        //         }
 
 
-                var users = request.Users.Select(u => new User
-                {
-                    UserId = (int)u.UserId,
-                    FrientId = (int)u.FriendId,
-                    DatasetId = datasetModel.Id
-                }).ToList();
+        //         var datasetModel = new Dataset
+        //         {
+        //             Name = request.DatasetName
+        //         };
+        //         await _context.Datasets.AddAsync(datasetModel);
+        //         await _context.SaveChangesAsync();
 
-                await _context.Users.AddRangeAsync(users);
-                await _context.SaveChangesAsync();
 
-                await transaction.CommitAsync();
+        //         var users = request.Users.Select(u => new User
+        //         {
+        //             UserId = (int)u.UserId,
+        //             FrientId = (int)u.FriendId,
+        //             DatasetId = datasetModel.Id
+        //         }).ToList();
 
-                datasetModel.UsersCount = await GetUsersCountForDataset(datasetModel.Id);
-                datasetModel.AverageFriendsPerUser = await GetAvarageUserFriendsForDataset(datasetModel.Id);
+        //         await _context.Users.AddRangeAsync(users);
+        //         await _context.SaveChangesAsync();
 
-                return datasetModel;
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-        }
+        //         await transaction.CommitAsync();
+
+        //         datasetModel.UsersCount = await GetUsersCountForDataset(datasetModel.Id);
+        //         datasetModel.AverageFriendsPerUser = await GetAvarageUserFriendsForDataset(datasetModel.Id);
+
+        //         return datasetModel;
+        //     }
+        //     catch
+        //     {
+        //         await transaction.RollbackAsync();
+        //         throw;
+        //     }
+        // }
 
         public async Task<bool> IsDatasetNameAvailable(string datasetName)
         {
             var datasetExists = await _context.Datasets.AnyAsync(u => u.Name == datasetName);
             return !datasetExists; // Return true if the name is available, false otherwise
         }
+
         public async Task<int> GetUsersCountForDataset(int datasetId)
         {
             var userIds = await _context.Users
@@ -125,15 +128,5 @@ namespace api.Repository
             return await _context.Datasets.Include(u => u.Users).ToListAsync();
         }
 
-        public async Task<IEnumerable<Dataset>> GetAllWithUserStatsAsync()
-        {
-            var datasets = await GetAllAsync();
-            foreach (var dataset in datasets)
-            {
-                dataset.UsersCount = await GetUsersCountForDataset(dataset.Id);
-                dataset.AverageFriendsPerUser = await GetAvarageUserFriendsForDataset(dataset.Id);
-            }
-            return datasets;
-        }
     }
 }
