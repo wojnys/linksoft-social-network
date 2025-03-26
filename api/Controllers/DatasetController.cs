@@ -1,10 +1,6 @@
-using api.Data;
 using api.Dtos.Databaset;
-using api.Interfaces;
 using api.Mappers;
-using api.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -14,63 +10,30 @@ namespace api.Controllers
 
     public class DatasetController : ControllerBase
     {
-
-        private readonly IDatasetRepository _datasetRepository;
-
-        public DatasetController(ApplicationDBContext context, IDatasetRepository datasetRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public DatasetController(IUnitOfWork unitOfWork)
         {
-            _datasetRepository = datasetRepository;
-
+            _unitOfWork = unitOfWork;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-
-            var datasets = await _datasetRepository.GetAllAsync();
-            var datasetDto = datasets.Select(s => s.ToDatasetDto()); // convert to DTO via mapper
-            return Ok(datasetDto);
+            var datasets = await _unitOfWork.Datasests.GetAllWithUserStatsAsync();
+            var datastsDto = datasets.Select(s => s.ToDatasetDtoWithoutUsers());
+            return Ok(datastsDto);
         }
 
-        [HttpGet("with-stats")]
-        public async Task<IActionResult> GetAllWithStats()
+        [HttpGet("with-users")]
+        public async Task<IActionResult> GetAllWithUsers()
         {
-            var listAllDatasets = await _datasetRepository.GetAllWithoutUsersAsync();
-            var datasetArr = new List<Dataset>();
+            var datasets = await _unitOfWork.Datasests.GetAllWithUsersAsync();
+            var datasetsDto = datasets.Select(s => s.ToDatasetDto());
 
-            foreach (var dat in listAllDatasets)
-            {
-                var dataset = await _datasetRepository.GetUsersDatasetStat(dat.Id);
-                datasetArr.Add(dataset);
-            }
-
-            var datasetsWithoutUserDto = datasetArr.Select(s => s.ToDatasetDtoWithoutUsers()); // convert to DTO via mapper
-            return Ok(datasetsWithoutUserDto);
+            return Ok(datasetsDto);
         }
-
-
-        [HttpGet("without-users")]
-        public async Task<IActionResult> GetAllWithoutUsers()
-        {
-
-            var datasets = await _datasetRepository.GetAllWithoutUsersAsync();
-            var datasetWithoutUsersDto = datasets.Select(s => s.ToDatasetDtoWithoutUsers()); // convert to DTO via mappe
-
-            return Ok(datasetWithoutUsersDto);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute] int id)
-        {
-            var dataset = await _datasetRepository.GetByIdAsync(id);
-            if (dataset == null)
-            {
-                return NotFound();
-            }
-            return Ok(dataset.ToDatasetDto());
-        }
-
         [HttpPost("create-dataset-with-users")]
-        public async Task<IActionResult> CreateDatasetWithUsers([FromBody] CreateDatasetWithUsersRequestDto request)
+        public async Task<IActionResult> CreateDataset([FromBody] CreateDatasetWithUsersRequestDto request)
         {
             if (request.DatasetName == null)
             {
@@ -79,7 +42,7 @@ namespace api.Controllers
 
             try
             {
-                var result = await _datasetRepository.CreateDatasetWithUsersAsync(request);
+                var result = await _unitOfWork.Datasests.AddDatasetWithUsersAsync(request);
 
                 if (result == null)
                 {
@@ -91,7 +54,21 @@ namespace api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
+
             }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var dataset = await _unitOfWork.Datasests.GetByIdAsync(id);
+
+            if (dataset == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(dataset.ToDatasetDto());
         }
     }
 }
