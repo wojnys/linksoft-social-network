@@ -31,7 +31,6 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-
 builder.Services.AddScoped<IDatasetRepository, DatatsetService>();
 builder.Services.AddScoped<IUserRepository, UserService>();
 
