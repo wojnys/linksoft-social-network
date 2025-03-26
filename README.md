@@ -4,12 +4,27 @@ include images
 ![Alt text](img2.png)
 ![Alt text](img3.png)
 
-# linksoft-social-network
+# LinkSoft Social Network
 
-### frontend is in NEXT JS
+This project consists of a frontend built with **Next.js** and a backend API using **ASP.NET**.
 
-### run `npm run dev`
+## Frontend (Next.js)
 
-### backed API is in ASP .NET
+To run the frontend, navigate to the frontend directory and execute:
 
-### `dotnet watch run`
+```sh
+npm run dev
+```
+
+## Backend API (ASP.NET)
+
+To run the backend API with hot reload and Swagger support, use:
+
+```sh
+dotnet watch run
+```
+
+
+## Notes
+- Ensure you have `Entity Framework Core` installed and configured before running migration commands.
+- Replace placeholders in `appsettings.json` with your actual database connection details
