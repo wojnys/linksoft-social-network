@@ -1,5 +1,7 @@
 using api.Dtos.Databaset;
+using api.Interfaces;
 using api.Mappers;
+using api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -10,28 +12,29 @@ namespace api.Controllers
 
     public class DatasetController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public DatasetController(IUnitOfWork unitOfWork)
+        private readonly IDatasetApplication _application;
+        public DatasetController(IDatasetApplication application)
         {
-            _unitOfWork = unitOfWork;
+            _application = application;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var datasets = await _unitOfWork.Datasests.GetAllWithUserStatsAsync();
-            var datastsDto = datasets.Select(s => s.ToDatasetDtoWithoutUsers());
-            return Ok(datastsDto);
+            var datasets = await _application.GetAllWithUserStatsAsync();
+
+            return Ok(datasets);
         }
 
-        [HttpGet("with-users")]
-        public async Task<IActionResult> GetAllWithUsers()
-        {
-            var datasets = await _unitOfWork.Datasests.GetAllWithUsersAsync();
-            var datasetsDto = datasets.Select(s => s.ToDatasetDto());
+        // [HttpGet("with-users")]
+        // public async Task<IActionResult> GetAllWithUsers()
+        // {
+        //     var datasets = await _unitOfWork.GetAllWithUsersAsync();
+        //     var datasetsDto = datasets.Select(s => s.ToDatasetDto());
 
-            return Ok(datasetsDto);
-        }
+        //     return Ok(datasetsDto);
+        // }
+
         [HttpPost("create-dataset-with-users")]
         public async Task<IActionResult> CreateDataset([FromBody] CreateDatasetWithUsersRequestDto request)
         {
@@ -42,7 +45,8 @@ namespace api.Controllers
 
             try
             {
-                var result = await _unitOfWork.Datasests.AddDatasetWithUsersAsync(request);
+
+                var result = await _application.AddDatasetWithUsersAsync(request);
 
                 if (result == null)
                 {
@@ -61,7 +65,7 @@ namespace api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var dataset = await _unitOfWork.Datasests.GetByIdAsync(id);
+            var dataset = await _application.GetByIdAsync(id);
 
             if (dataset == null)
             {
@@ -69,6 +73,8 @@ namespace api.Controllers
             }
 
             return Ok(dataset.ToDatasetDto());
+
+
         }
     }
 }
