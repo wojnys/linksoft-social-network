@@ -16,13 +16,13 @@ namespace api.Services
         public async Task<Dataset?> AddDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request)
         {
             // Start a transaction
-            // using var transaction = await _unitOfWork.Database.BeginTransactionAsync();
+            using var transaction = await _unitOfWork.Datasests.BeginTransactionAsync();
             try
             {
 
                 if (await _unitOfWork.Datasests.IsDatasetNameAvailable(request.DatasetName) == false)
                 {
-                    // await transaction.RollbackAsync();
+                    await transaction.RollbackAsync();
                     return null;
                 }
 
@@ -33,7 +33,6 @@ namespace api.Services
                 };
                 await _unitOfWork.Datasests.AddAsync(datasetModel);
                 await _unitOfWork.Complete();
-
 
 
                 var users = request.Users.Select(u => new User
@@ -56,12 +55,10 @@ namespace api.Services
             }
             catch
             {
-                //await transaction.RollbackAsync();
+                await transaction.RollbackAsync();
                 throw;
             }
         }
-
-
 
         public Task<IEnumerable<Dataset>> GetAllWithUsersAsync()
         {
