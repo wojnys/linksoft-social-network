@@ -1,10 +1,13 @@
 using System.Linq.Expressions;
 using api.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
     protected readonly ApplicationDBContext _context;
+    private IDbContextTransaction _transaction;
+
     public GenericRepository(ApplicationDBContext context)
     {
         _context = context;
@@ -17,7 +20,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     public async Task AddRangeAsync(IEnumerable<T> entities)
     {
-        _context.Set<T>().AddRange(entities);
+        await _context.Set<T>().AddRangeAsync(entities);
     }
 
     public IEnumerable<T> Find(Expression<Func<T, bool>> expression)
@@ -39,6 +42,32 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             throw new KeyNotFoundException($"Entity of type {typeof(T).Name} with ID {id} was not found.");
         }
         return entity;
+    }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    {
+        _transaction = await _context.Database.BeginTransactionAsync();
+        return _transaction;
+    }
+
+    public async Task CommitTransactionAsync()
+    {
+        if (_transaction != null)
+        {
+            await _transaction.CommitAsync();
+            await _transaction.DisposeAsync();
+            _transaction = null;
+        }
+    }
+
+    public async Task RollbackTransactionAsync()
+    {
+        if (_transaction != null)
+        {
+            await _transaction.RollbackAsync();
+            await _transaction.DisposeAsync();
+            _transaction = null;
+        }
     }
 
     public void Remove(T entity)

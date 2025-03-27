@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.Storage;
 
 public interface IGenericRepository<T> where T : class
 {
@@ -9,4 +10,8 @@ public interface IGenericRepository<T> where T : class
     Task AddRangeAsync(IEnumerable<T> entities);
     void Remove(T entity);
     void RemoveRange(IEnumerable<T> entities);
+
+    Task<IDbContextTransaction> BeginTransactionAsync();
+    Task CommitTransactionAsync();
+    Task RollbackTransactionAsync();
 }
