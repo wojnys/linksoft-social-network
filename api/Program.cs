@@ -1,4 +1,3 @@
-using api.Applications;
 using api.Data;
 using api.Interfaces;
 using api.Repository;
@@ -38,7 +37,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IDatasetRepository, DatasetRepository>();
 builder.Services.AddScoped<IDatasetService, DatasetService>();
-builder.Services.AddScoped<IDatasetApplication, DatasetApplication>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();

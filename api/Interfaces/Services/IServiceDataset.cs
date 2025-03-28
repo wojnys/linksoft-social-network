@@ -9,8 +9,6 @@ namespace api.Services
 
         Task<Dataset?> AddDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request);
 
-        Task<IEnumerable<Dataset>> GetAllWithUsersAsync();
-
         Task<IEnumerable<Dataset>> GetAllWithUserStatsAsync();
 
         Task<Dataset?> GetByIdAsync(int id);

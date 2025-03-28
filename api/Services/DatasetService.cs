@@ -15,17 +15,16 @@ namespace api.Services
 
         public async Task<Dataset?> AddDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request)
         {
+
             // Start a transaction
             using var transaction = await _unitOfWork.Datasests.BeginTransactionAsync();
             try
             {
-
                 if (await _unitOfWork.Datasests.IsDatasetNameAvailable(request.DatasetName) == false)
                 {
                     await transaction.RollbackAsync();
                     return null;
                 }
-
 
                 var datasetModel = new Dataset
                 {
@@ -45,11 +44,10 @@ namespace api.Services
                 await _unitOfWork.Users.AddRangeAsync(users);
                 await _unitOfWork.Complete();
 
+                await transaction.CommitAsync();
 
-                // await _unitOfWork.transaction.CommitAsync();
-
-                datasetModel.UsersCount = await _unitOfWork.Datasests.GetUsersCountForDataset(datasetModel.Id);
-                datasetModel.AverageFriendsPerUser = await _unitOfWork.Datasests.GetAvarageUserFriendsForDataset(datasetModel.Id);
+                datasetModel.UsersCount = await GetUsersCountForDataset(datasetModel.Id);
+                datasetModel.AverageFriendsPerUser = await GetAverageUserFriendsForDataset(datasetModel.Id);
 
                 return datasetModel;
             }
@@ -60,9 +58,21 @@ namespace api.Services
             }
         }
 
-        public Task<IEnumerable<Dataset>> GetAllWithUsersAsync()
+        public async Task<int> GetUsersCountForDataset(int datasetId)
         {
-            throw new NotImplementedException();
+            var userIds = await _unitOfWork.Datasests.GetUserIdsForDataset(datasetId);
+            var friendIds = await _unitOfWork.Datasests.GetFriendIdsForDataset(datasetId);
+
+            return userIds.Union(friendIds).Distinct().Count();
+        }
+
+        public async Task<double> GetAverageUserFriendsForDataset(int datasetId)
+        {
+            var userFriendCounts = await _unitOfWork.Datasests.GetUserFriendCountsForDataset(datasetId);
+
+            if (!userFriendCounts.Any()) return 0;
+
+            return userFriendCounts.Average(x => x.Count);
         }
 
         public async Task<IEnumerable<Dataset>> GetAllWithUserStatsAsync()
@@ -70,8 +80,8 @@ namespace api.Services
             var datasets = await _unitOfWork.Datasests.GetAllAsync();
             foreach (var dataset in datasets)
             {
-                dataset.UsersCount = await _unitOfWork.Datasests.GetUsersCountForDataset(dataset.Id);
-                dataset.AverageFriendsPerUser = await _unitOfWork.Datasests.GetAvarageUserFriendsForDataset(dataset.Id);
+                dataset.UsersCount = await GetUsersCountForDataset(dataset.Id);
+                dataset.AverageFriendsPerUser = await GetAverageUserFriendsForDataset(dataset.Id);
             }
             return datasets;
         }
@@ -86,5 +96,6 @@ namespace api.Services
         {
             return await _unitOfWork.Datasests.IsDatasetNameAvailable(datasetName);
         }
+
     }
 }
