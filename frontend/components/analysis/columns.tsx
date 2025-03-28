@@ -7,17 +7,17 @@ export const columns: ColumnDef<analysisTableDataType>[] = [
     {
         accessorKey: "id",
         header: "Dataset ID",
-        cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
+        cell: ({ row }) => <div className="">{row.getValue("id")}</div>,
     },
     {
         accessorKey: "name",
         header: "Dataset name",
-        cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+        cell: ({ row }) => <div className="">{row.getValue("name")}</div>,
     },
     {
         accessorKey: "averageFriendsPerUser",
         header: "Average Friends Per User",
-        cell: ({ row }) => <div className="capitalize">{row.getValue("averageFriendsPerUser")}</div>,
+        cell: ({ row }) => <div className="">{row.getValue("averageFriendsPerUser")}</div>,
     },
     {
         accessorKey: "usersCount",

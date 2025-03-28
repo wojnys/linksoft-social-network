@@ -48,7 +48,7 @@ namespace api.Controllers
 
                 if (result == null)
                 {
-                    return BadRequest(new { Message = "Dataset name already exists", DatasetName = request.DatasetName });
+                    return Conflict(new { Message = "Dataset name already exists", DatasetName = request.DatasetName });
                 }
 
                 return CreatedAtAction(nameof(GetById), new { id = result.Id }, result.ToDatasetDtoWithoutUsers());

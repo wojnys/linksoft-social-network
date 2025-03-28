@@ -66,13 +66,13 @@ namespace api.Services
             return userIds.Union(friendIds).Distinct().Count();
         }
 
-        public async Task<double> GetAverageUserFriendsForDataset(int datasetId)
+        public async Task<int> GetAverageUserFriendsForDataset(int datasetId)
         {
             var userFriendCounts = await _unitOfWork.Datasests.GetUserFriendCountsForDataset(datasetId);
 
             if (!userFriendCounts.Any()) return 0;
 
-            return userFriendCounts.Average(x => x.Count);
+            return (int)Math.Round(userFriendCounts.Average(x => x.Count));
         }
 
         public async Task<IEnumerable<Dataset>> GetAllWithUserStatsAsync()
