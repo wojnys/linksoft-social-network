@@ -26,6 +26,14 @@ namespace api.Mappers
             };
         }
 
+        public static Dataset ToDatasetModel(this CreateDatasetWithUsersRequestDto request)
+        {
+            return new Dataset
+            {
+                Name = request.DatasetName
+            };
+        }
+
 
     }
 }

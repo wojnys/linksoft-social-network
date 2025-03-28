@@ -1,5 +1,6 @@
 using api.Data;
 using api.Interfaces;
+using api.Interfaces.Services;
 using api.Repository;
 using api.Services;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,7 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IDatasetRepository, DatasetRepository>();
 builder.Services.AddScoped<IDatasetService, DatasetService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

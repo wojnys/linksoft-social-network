@@ -16,5 +16,15 @@ namespace api.Mappers
                 DatasetId = userModel.DatasetId,
             };
         }
+
+        public static User ToUserModel(this CreateUserDto request)
+        {
+            return new User
+            {
+                UserId = request.UserId,
+                FrientId = request.FrientId,
+                DatasetId = request.DatasetId,
+            };
+        }
     }
 }

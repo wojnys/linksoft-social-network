@@ -1,5 +1,6 @@
 using api.Dtos.Databaset;
 using api.Interfaces;
+using api.Interfaces.Services;
 using api.Mappers;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,15 @@ namespace api.Controllers
 
     public class DatasetController : ControllerBase
     {
-        private readonly IDatasetService _service;
-        public DatasetController(IDatasetService service)
+        private readonly IDatasetService _datasetService;
+        private readonly IUserService _userService;
+
+
+        public DatasetController(IDatasetService datasetService, IUserService userService)
         {
-            _service = service;
+            _datasetService = datasetService;
+            _userService = userService;
+
         }
 
         [HttpGet]
@@ -23,7 +29,7 @@ namespace api.Controllers
         {
             try
             {
-                var datasets = await _service.GetAllWithUserStatsAsync();
+                var datasets = await _datasetService.GetAllWithUserStatsAsync();
 
                 return Ok(datasets);
             }
@@ -44,12 +50,19 @@ namespace api.Controllers
 
             try
             {
-                var result = await _service.AddDatasetWithUsersAsync(request);
 
-                if (result == null)
+                if (!await _datasetService.IsDatasetNameAvailable(request.DatasetName))
                 {
                     return Conflict(new { Message = "Dataset name already exists", DatasetName = request.DatasetName });
                 }
+
+                // create dataset
+                var datasetModel = await _datasetService.CreateDatasetAsync(request.ToDatasetModel());
+                // create user
+                var userModel = await _userService.CreateUsersAsync(request.Users, datasetModel.Id);
+
+                var result = await _datasetService.GetDatasetUserStats(datasetModel.Id);
+
 
                 return CreatedAtAction(nameof(GetById), new { id = result.Id }, result.ToDatasetDtoWithoutUsers());
             }
@@ -65,7 +78,7 @@ namespace api.Controllers
         {
             try
             {
-                var dataset = await _service.GetByIdAsync(id);
+                var dataset = await _datasetService.GetByIdAsync(id);
 
                 if (dataset == null)
                 {
