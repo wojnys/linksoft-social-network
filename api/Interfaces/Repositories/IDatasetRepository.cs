@@ -6,7 +6,7 @@ namespace api.Interfaces
 {
     public interface IDatasetRepository : IGenericRepository<Dataset>
     {
-
+        Task<Dataset> CreateDatasetAsync(Dataset request);
         Task<IEnumerable<int>> GetUserIdsForDataset(int datasetId);
         Task<IEnumerable<int>> GetFriendIdsForDataset(int datasetId);
         Task<List<(int UserId, int Count)>> GetUserFriendCountsForDataset(int datasetId);

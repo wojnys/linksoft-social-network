@@ -31,6 +31,17 @@ namespace api.Repository
                 .ToListAsync();
         }
 
+        public async Task<Dataset> CreateDatasetAsync(Dataset request)
+        {
+            var datasetModel = new Dataset
+            {
+                Name = request.Name
+            };
+            await AddAsync(datasetModel);
+            await _context.SaveChangesAsync();
+            return datasetModel;
+        }
+
         public async Task<IEnumerable<int>> GetFriendIdsForDataset(int datasetId)
         {
             return await _context.Users

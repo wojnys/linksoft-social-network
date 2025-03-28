@@ -1,6 +1,7 @@
 
 using api.Dtos.Databaset;
 using api.Interfaces;
+using api.Mappers;
 using api.Models;
 
 namespace api.Services
@@ -13,18 +14,37 @@ namespace api.Services
             _unitOfWork = unitOfWork;
         }
 
-        // Create task for CreateDataset
-
-        public async Task<Dataset> CreateDatasetAsync(Dataset request)
+        public async Task<Dataset> AddDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request)
         {
-            var datasetModel = new Dataset
+            // Start a transaction
+            using var transaction = await _unitOfWork.Datasests.BeginTransactionAsync();
+            try
             {
-                Name = request.Name
-            };
-            await _unitOfWork.Datasests.AddAsync(datasetModel);
-            await _unitOfWork.Complete();
-            return datasetModel;
+
+                if (await _unitOfWork.Datasests.IsDatasetNameAvailable(request.DatasetName) == false)
+                {
+                    await transaction.RollbackAsync();
+
+                }
+
+                var datasetModel = await _unitOfWork.Datasests.CreateDatasetAsync(request.ToDatasetModel());
+
+                var users = await _unitOfWork.Users.CreateUsersAsync(request.Users, datasetModel.Id);
+
+                await transaction.CommitAsync();
+
+                datasetModel.UsersCount = await GetUsersCountForDataset(datasetModel.Id);
+                datasetModel.AverageFriendsPerUser = await GetAverageUserFriendsForDataset(datasetModel.Id);
+
+                return datasetModel;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
+
 
 
         public async Task<int> GetUsersCountForDataset(int datasetId)

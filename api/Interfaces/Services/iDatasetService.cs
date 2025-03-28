@@ -7,10 +7,11 @@ namespace api.Services
     public interface IDatasetService
     {
 
+        Task<Dataset> AddDatasetWithUsersAsync(CreateDatasetWithUsersRequestDto request);
         Task<Dataset> GetDatasetUserStats(int datasetId);
 
         Task<IEnumerable<Dataset>> GetAllWithUserStatsAsync();
-        Task<Dataset> CreateDatasetAsync(Dataset request);
+        // Task<Dataset> CreateDatasetAsync(Dataset request);
 
         Task<Dataset> GetByIdAsync(int id);
 

@@ -11,20 +11,20 @@ namespace api.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<List<User>> CreateUsersAsync(List<UserRequestDto> users, int datasetId)
-        {
+        // public async Task<List<User>> CreateUsersAsync(List<UserRequestDto> users, int datasetId)
+        // {
 
-            var userModels = users.Select(u => new User
-            {
-                UserId = u.UserId,
-                FrientId = u.FriendId,
-                DatasetId = datasetId
-            }).ToList();
+        //     var userModels = users.Select(u => new User
+        //     {
+        //         UserId = u.UserId,
+        //         FrientId = u.FriendId,
+        //         DatasetId = datasetId
+        //     }).ToList();
 
-            await _unitOfWork.Users.AddRangeAsync(userModels);
-            await _unitOfWork.Complete();
+        //     await _unitOfWork.Users.AddRangeAsync(userModels);
+        //     await _unitOfWork.Complete();
 
-            return userModels;
-        }
+        //     return userModels;
+        // }
     }
 }

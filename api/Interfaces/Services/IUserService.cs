@@ -5,6 +5,6 @@ namespace api.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<List<User>> CreateUsersAsync(List<UserRequestDto> users, int datasetId);
+        // Task<List<User>> CreateUsersAsync(List<UserRequestDto> users, int datasetId);
     }
 }
