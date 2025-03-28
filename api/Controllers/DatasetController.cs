@@ -14,13 +14,11 @@ namespace api.Controllers
     public class DatasetController : ControllerBase
     {
         private readonly IDatasetService _datasetService;
-        private readonly IUserService _userService;
 
-
-        public DatasetController(IDatasetService datasetService, IUserService userService)
+        public DatasetController(IDatasetService datasetService)
         {
             _datasetService = datasetService;
-            _userService = userService;
+
 
         }
 
@@ -56,14 +54,7 @@ namespace api.Controllers
                     return Conflict(new { Message = "Dataset name already exists", DatasetName = request.DatasetName });
                 }
 
-                // // create dataset
-                // var datasetModel = await _datasetService.CreateDatasetAsync(request.ToDatasetModel());
-                // // create user
-                // var userModel = await _userService.CreateUsersAsync(request.Users, datasetModel.Id);
-
-                // var result = await _datasetService.GetDatasetUserStats(datasetModel.Id);
                 var result = await _datasetService.AddDatasetWithUsersAsync(request);
-
 
                 return CreatedAtAction(nameof(GetById), new { id = result.Id }, result.ToDatasetDtoWithoutUsers());
             }
